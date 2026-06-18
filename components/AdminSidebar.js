@@ -20,6 +20,7 @@ export default function AdminSidebar() {
     { href: "/admin/classes", label: "Classes", icon: "🏫" },
     { href: "/admin/subjects", label: "Matières", icon: "📚" },
     { href: "/admin/users", label: "Utilisateurs", icon: "👥" },
+    { href: "/admin/terms", label: "Années & Trimestres", icon: "📆" },
   ];
 
   return (
