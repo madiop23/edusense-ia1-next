@@ -18,6 +18,7 @@ export default function TeacherSidebar({ open, onClose }) {
     { href: "/teacher/dashboard", label: "Tableau de bord", icon: "🏠" },
     { href: "/teacher/classes", label: "Mes classes", icon: "🏫" },
     { href: "/teacher/grades", label: "Notes", icon: "⭐" },
+    { href: "/teacher/assignments", label: "Devoirs", icon: "📝" },
     { href: "/teacher/attendance", label: "Présences", icon: "📋" },
   ];
 
