@@ -83,6 +83,7 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Connexion</h1>
         <p className="text-gray-500 text-sm mb-6">Accédez à votre espace</p>
 
+        {/* Message d'erreur */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm">
             {error}
@@ -122,6 +123,14 @@ export default function LoginPage() {
             {loading ? "Connexion..." : "Se connecter"}
           </button>
         </form>
+
+        {/* Lien inscription parent */}
+        <p className="text-center text-sm text-gray-500 mt-6">
+          Parent avec un code ?{" "}
+          <a href="/register/parent" className="text-green-600 font-medium hover:underline">
+            S'inscrire ici
+          </a>
+        </p>
       </div>
     </div>
   );

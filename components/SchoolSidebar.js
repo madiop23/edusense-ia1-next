@@ -18,6 +18,7 @@ export default function SchoolSidebar({ open, onClose }) {
     { href: "/school/dashboard", label: "Tableau de bord", icon: "🏠" },
     { href: "/school/classes", label: "Classes", icon: "🏫" },
     { href: "/school/students", label: "Élèves", icon: "🎓" },
+    { href: "/school/invites", label: "Codes parents", icon: "🔑" },
   ];
 
   return (
