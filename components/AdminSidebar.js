@@ -21,7 +21,10 @@ export default function AdminSidebar({ open, onClose }) {
     { href: "/admin/terms", label: "Années & Trimestres", icon: "📆" },
     { href: "/admin/users", label: "Utilisateurs", icon: "👥" },
     { href: "/admin/assignments", label: "Affectations", icon: "🔗" },
+    { href: "/admin/school", label: "Profil école", icon: "🏛️" },
     { href: "/admin/invites", label: "Codes parents", icon: "🔑" },
+    { href: "/admin/departments", label: "Départements", icon: "🏢" },
+    { href: "/admin/representatives", label: "Représentants", icon: "🧭" },
     
   ];
 
@@ -53,7 +56,7 @@ export default function AdminSidebar({ open, onClose }) {
           <button onClick={onClose} className="md:hidden text-green-200 hover:text-white text-xl">✕</button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {links.map((link) => {
             const active = pathname === link.href;
             return (

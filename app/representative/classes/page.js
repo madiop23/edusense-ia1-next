@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "@/lib/firebase";
 import { SCHOOL_ID } from "@/lib/school";
 
 export default function RepresentativeClassesPage() {
@@ -11,11 +12,19 @@ export default function RepresentativeClassesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
       try {
-        const classesSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "classes"));
-        setClasses(classesSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        // 1. Charger le périmètre du représentant (ses classes assignées)
+        const repDoc = await getDoc(doc(db, "schools", SCHOOL_ID, "representatives", user.uid));
+        const assignedClassIds = repDoc.exists() ? (repDoc.data().assignedClassIds || []) : [];
 
+        // 2. Charger toutes les classes, puis filtrer sur le périmètre
+        const classesSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "classes"));
+        const allClasses = classesSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setClasses(allClasses.filter((c) => assignedClassIds.includes(c.id)));
+
+        // 3. Charger les élèves
         const studentsSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "students"));
         setStudents(studentsSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
       } catch (err) {
@@ -23,8 +32,8 @@ export default function RepresentativeClassesPage() {
       } finally {
         setLoading(false);
       }
-    };
-    loadData();
+    });
+    return () => unsub();
   }, []);
 
   const countStudents = (classId) => students.filter((s) => s.classId === classId).length;
@@ -38,17 +47,19 @@ export default function RepresentativeClassesPage() {
         <p className="text-green-100 text-sm">Les classes de votre périmètre.</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b flex items-center justify-between">
-          <h2 className="font-semibold text-gray-700">Classes</h2>
-          <span className="text-sm text-gray-500">{classes.length} classe(s)</span>
+      {loading ? (
+        <p className="text-center text-gray-400 py-8 text-sm">Chargement...</p>
+      ) : classes.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center text-gray-400">
+          <p>Aucune classe dans votre périmètre.</p>
+          <p className="text-xs mt-1">Contactez l'administration pour vos affectations.</p>
         </div>
-
-        {loading ? (
-          <p className="text-center text-gray-400 py-8 text-sm">Chargement...</p>
-        ) : classes.length === 0 ? (
-          <p className="text-center text-gray-400 py-8 text-sm">Aucune classe.</p>
-        ) : (
+      ) : (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="px-6 py-4 border-b flex items-center justify-between">
+            <h2 className="font-semibold text-gray-700">Mes classes</h2>
+            <span className="text-sm text-gray-500">{classes.length} classe(s)</span>
+          </div>
           <div className="divide-y">
             {classes.map((c) => (
               <div key={c.id} className="px-6 py-3 flex items-center justify-between hover:bg-green-50 transition">
@@ -62,8 +73,8 @@ export default function RepresentativeClassesPage() {
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
     </div>
   );

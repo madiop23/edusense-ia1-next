@@ -39,7 +39,7 @@ export default function TeacherSidebar({ open, onClose }) {
           </div>
           <button onClick={onClose} className="md:hidden text-green-200 hover:text-white text-xl">✕</button>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {links.map((link) => {
             const active = pathname === link.href;
             return (
