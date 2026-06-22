@@ -21,6 +21,8 @@ export default function TeacherSidebar({ open, onClose }) {
     { href: "/teacher/assignments", label: "Devoirs", icon: "📝" },
     { href: "/teacher/submissions", label: "Rendus", icon: "📥" },
     { href: "/teacher/attendance", label: "Présences", icon: "📋" },
+    { href: "/teacher/appreciations", label: "Appréciations", icon: "📄" },
+    { href: "/teacher/alerts", label: "Alertes IA", icon: "⚠️" },
   ];
 
   return (

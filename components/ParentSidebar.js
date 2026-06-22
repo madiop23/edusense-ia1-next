@@ -17,7 +17,10 @@ export default function ParentSidebar({ open, onClose }) {
   const links = [
     { href: "/parent/dashboard", label: "Tableau de bord", icon: "🏠" },
     { href: "/parent/children", label: "Mes enfants", icon: "👨‍👩‍👧" },
+    { href: "/parent/follow-up", label: "Suivi", icon: "📊" },
     { href: "/parent/fees", label: "Frais", icon: "💳" },
+    { href: "/parent/assistant", label: "Assistant IA", icon: "💬" },
+    { href: "/parent/messages", label: "Messages", icon: "✉️" },
   ];
 
   return (

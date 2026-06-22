@@ -19,6 +19,7 @@ export default function SchoolSidebar({ open, onClose }) {
     { href: "/school/classes", label: "Classes", icon: "🏫" },
     { href: "/school/students", label: "Élèves", icon: "🎓" },
     { href: "/school/invites", label: "Codes parents", icon: "🔑" },
+    { href: "/school/alerts", label: "Alertes IA", icon: "⚠️" },
   ];
 
   return (
