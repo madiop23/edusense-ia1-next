@@ -19,6 +19,7 @@ export default function StudentSidebar({ open, onClose }) {
     { href: "/student/grades", label: "Mes notes", icon: "⭐" },
     { href: "/student/attendance", label: "Mes présences", icon: "📋" },
     { href: "/student/timetable", label: "Emploi du temps", icon: "📅" },
+    { href: "/student/assignments", label: "Mes devoirs", icon: "📝" },
   ];
 
   return (
