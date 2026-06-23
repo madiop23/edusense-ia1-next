@@ -25,6 +25,7 @@ export default function AdminSidebar({ open, onClose }) {
     { href: "/admin/invites", label: "Codes parents", icon: "🔑" },
     { href: "/admin/departments", label: "Départements", icon: "🏢" },
     { href: "/admin/representatives", label: "Représentants", icon: "🧭" },
+    { href: "/admin/invoices", label: "Factures", icon: "💳" },
     
   ];
 
