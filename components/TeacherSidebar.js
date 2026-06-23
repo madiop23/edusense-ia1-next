@@ -23,6 +23,7 @@ export default function TeacherSidebar({ open, onClose }) {
     { href: "/teacher/attendance", label: "Présences", icon: "📋" },
     { href: "/teacher/appreciations", label: "Appréciations", icon: "📄" },
     { href: "/teacher/alerts", label: "Alertes IA", icon: "⚠️" },
+    { href: "/teacher/messages", label: "Messages", icon: "✉️" },
   ];
 
   return (

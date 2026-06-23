@@ -21,6 +21,7 @@ export default function StudentSidebar({ open, onClose }) {
     { href: "/student/timetable", label: "Emploi du temps", icon: "📅" },
     { href: "/student/assignments", label: "Mes devoirs", icon: "📝" },
     { href: "/student/assistant", label: "Assistant IA", icon: "💬" },
+    { href: "/student/messages", label: "Messages", icon: "✉️" },
   ];
 
   return (
