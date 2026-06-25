@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, getDocs, doc, getDoc, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { SCHOOL_ID } from "@/lib/school";
@@ -16,47 +16,26 @@ const PERIODS = [
   { index: 6, start: "15:00", end: "16:00" },
 ];
 
-export default function StudentTimetablePage() {
-  const [slots, setSlots] = useState([]);
+export default function TeacherTimetablePage() {
+  const [mySlots, setMySlots] = useState([]);
   const [subjects, setSubjects] = useState([]);
-  const [usersMap, setUsersMap] = useState({});
+  const [classes, setClasses] = useState([]);
   const [terms, setTerms] = useState([]);
   const [termId, setTermId] = useState("");
-  const [className, setClassName] = useState("");
-  const [classId, setClassId] = useState("");
+  const [currentUid, setCurrentUid] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
+      setCurrentUid(user.uid);
       try {
-        // Profil élève -> studentId -> classId
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        const studentId = userDoc.exists() ? userDoc.data().studentId : null;
-        let myClassId = null;
-        if (studentId) {
-          const sDoc = await getDoc(doc(db, "schools", SCHOOL_ID, "students", studentId));
-          if (sDoc.exists()) {
-            myClassId = sDoc.data().classId;
-            const cDoc = await getDoc(doc(db, "schools", SCHOOL_ID, "classes", myClassId));
-            if (cDoc.exists()) setClassName(cDoc.data().name);
-          }
-        }
-        setClassId(myClassId);
-
-        // Matières + users (noms profs)
         const subjectsSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "subjects"));
         setSubjects(subjectsSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
 
-        const usersSnap = await getDocs(collection(db, "users"));
-        const map = {};
-        usersSnap.docs.forEach((d) => {
-          const u = d.data();
-          map[d.id] = u.displayName || u.email || "Enseignant";
-        });
-        setUsersMap(map);
+        const classesSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "classes"));
+        setClasses(classesSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
 
-        // Trimestres
         const termsSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "terms"));
         const termsList = termsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
         setTerms(termsList);
@@ -70,33 +49,36 @@ export default function StudentTimetablePage() {
     return () => unsub();
   }, []);
 
-  // Charger l'emploi du temps de la classe pour le trimestre choisi
   useEffect(() => {
-    if (!classId || !termId) {
-      setSlots([]);
+    if (!termId || !currentUid) {
+      setMySlots([]);
       return;
     }
-    const loadTimetable = async () => {
+    const loadMySlots = async () => {
       const q = query(
         collection(db, "schools", SCHOOL_ID, "timetables"),
-        where("classId", "==", classId),
         where("termId", "==", termId)
       );
       const snap = await getDocs(q);
-      if (!snap.empty) {
-        setSlots(snap.docs[0].data().slots || []);
-      } else {
-        setSlots([]);
-      }
+      const collected = [];
+      snap.docs.forEach((ttDoc) => {
+        const data = ttDoc.data();
+        (data.slots || []).forEach((s) => {
+          if (s.teacherId === currentUid) {
+            collected.push({ ...s, classId: data.classId });
+          }
+        });
+      });
+      setMySlots(collected);
     };
-    loadTimetable();
-  }, [classId, termId]);
+    loadMySlots();
+  }, [termId, currentUid]);
 
   const subjectName = (id) => subjects.find((s) => s.id === id)?.name || "";
+  const className = (id) => classes.find((c) => c.id === id)?.name || "";
 
-  // Récupérer le slot pour un jour + période
   const getSlot = (day, periodIndex) =>
-    slots.find((s) => s.dayOfWeek === day && s.periodIndex === periodIndex);
+    mySlots.find((s) => s.dayOfWeek === day && s.periodIndex === periodIndex);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -104,10 +86,9 @@ export default function StudentTimetablePage() {
       <div className="rounded-2xl p-6 text-white shadow-lg"
            style={{ background: "linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%)" }}>
         <h1 className="text-2xl font-bold mb-1">Mon emploi du temps</h1>
-        <p className="text-green-100 text-sm">Classe {className || "—"}</p>
+        <p className="text-green-100 text-sm">Tous vos cours de la semaine.</p>
       </div>
 
-      {/* Sélecteur trimestre */}
       {terms.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {terms.map((t) => (
@@ -123,9 +104,9 @@ export default function StudentTimetablePage() {
 
       {loading ? (
         <p className="text-center text-gray-400 py-8 text-sm">Chargement...</p>
-      ) : slots.length === 0 ? (
+      ) : mySlots.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center text-gray-400">
-          <p>Aucun emploi du temps disponible pour ce trimestre.</p>
+          <p>Aucun cours programmé pour ce trimestre.</p>
         </div>
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-x-auto">
@@ -152,7 +133,7 @@ export default function StudentTimetablePage() {
                         {slot ? (
                           <div className="bg-green-50 rounded-lg p-2">
                             <div className="font-medium text-green-800 text-xs">{subjectName(slot.subjectId)}</div>
-                            <div className="text-xs text-gray-500 mt-1">{usersMap[slot.teacherId] || ""}</div>
+                            <div className="text-xs text-gray-600 mt-1">{className(slot.classId)}</div>
                             {slot.room && <div className="text-xs text-gray-400">Salle {slot.room}</div>}
                           </div>
                         ) : (
