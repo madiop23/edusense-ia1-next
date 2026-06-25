@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { SCHOOL_ID } from "@/lib/school";
+import { createNotification } from "@/lib/notifications";
 
 export default function TeacherAssignmentsPage() {
   const [classes, setClasses] = useState([]);
@@ -137,8 +138,35 @@ export default function TeacherAssignmentsPage() {
   };
 
   const handlePublish = async (id) => {
-    await updateDoc(doc(db, "schools", SCHOOL_ID, "assignments", id), { status: "published" });
-    reload();
+    try {
+      await updateDoc(doc(db, "schools", SCHOOL_ID, "assignments", id), { status: "published" });
+
+      // Retrouver le devoir pour notifier les élèves de sa classe
+      const assignment = assignments.find((a) => a.id === id);
+      if (assignment) {
+        const studentsSnap = await getDocs(
+          query(collection(db, "schools", SCHOOL_ID, "students"), where("classId", "==", assignment.classId))
+        );
+        for (const sDoc of studentsSnap.docs) {
+          const student = sDoc.data();
+          if (student.userId) {
+            await createNotification({
+              userId: student.userId,
+              type: "assignment",
+              title: "Nouveau devoir publié",
+              body: `Un nouveau devoir "${assignment.title}" a été publié.`,
+              module: "academics",
+              entityId: assignment.id,
+              actionUrl: "/student/assignments",
+            });
+          }
+        }
+      }
+
+      reload();
+    } catch (err) {
+      console.error("Erreur publication devoir:", err);
+    }
   };
 
   const handleDelete = async (id) => {

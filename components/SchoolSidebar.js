@@ -16,6 +16,7 @@ export default function SchoolSidebar({ open, onClose }) {
 
   const links = [
     { href: "/school/dashboard", label: "Tableau de bord", icon: "🏠" },
+    { href: "/notifications", label: "Notifications", icon: "🔔" },
     { href: "/school/classes", label: "Classes", icon: "🏫" },
     { href: "/school/students", label: "Élèves", icon: "🎓" },
     { href: "/school/invites", label: "Codes parents", icon: "🔑" },

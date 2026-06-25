@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { SCHOOL_ID } from "@/lib/school";
+import { createNotification } from "@/lib/notifications";
 
 export default function AdminInvoicesPage() {
   const [students, setStudents] = useState([]);
@@ -54,7 +55,7 @@ export default function AdminInvoicesPage() {
     return () => unsub();
   }, []);
 
-  const handleCreate = async (e) => {
+ const handleCreate = async (e) => {
     e.preventDefault();
     if (!studentId || !termId || !label.trim() || !amount || !dueDate) {
       setMessage("❌ Remplissez tous les champs.");
@@ -63,7 +64,7 @@ export default function AdminInvoicesPage() {
     setMessage("");
     try {
       const total = parseFloat(amount);
-      await addDoc(invoicesRef, {
+      const invoiceRef = await addDoc(invoicesRef, {
         studentId, termId,
         lineItems: [{ label: label, amount: total }],
         total: total,
@@ -72,6 +73,24 @@ export default function AdminInvoicesPage() {
         dueDate: new Date(dueDate),
         createdAt: new Date(),
       });
+
+      // Notifier le(s) parent(s) de cet élève
+      const linksSnap = await getDocs(
+        query(collection(db, "parentLinks"), where("studentId", "==", studentId))
+      );
+      for (const linkDoc of linksSnap.docs) {
+        const parentId = linkDoc.data().parentId;
+        await createNotification({
+          userId: parentId,
+          type: "invoice",
+          title: "Nouvelle facture",
+          body: `Une facture "${label}" de ${total.toLocaleString()} FCFA a été émise pour ${studentName(studentId)}.`,
+          module: "fees",
+          entityId: invoiceRef.id,
+          actionUrl: "/parent/fees",
+        });
+      }
+
       setStudentId(""); setTermId(""); setLabel(""); setAmount(""); setDueDate("");
       setMessage("✅ Facture créée !");
       loadData();

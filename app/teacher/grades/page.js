@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc, getDocs, getDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { SCHOOL_ID } from "@/lib/school";
+import { createNotification } from "@/lib/notifications";
 
 export default function TeacherGradesPage() {
   const [students, setStudents] = useState([]);
@@ -104,8 +105,30 @@ export default function TeacherGradesPage() {
   };
 
   const handlePublish = async (id) => {
-    await updateDoc(doc(db, "schools", SCHOOL_ID, "grades", id), { published: true });
-    reloadGrades();
+    try {
+      await updateDoc(doc(db, "schools", SCHOOL_ID, "grades", id), { published: true });
+
+      // Retrouver la note pour notifier l'élève
+      const grade = grades.find((g) => g.id === id);
+      if (grade) {
+        const studentDoc = await getDoc(doc(db, "schools", SCHOOL_ID, "students", grade.studentId));
+        if (studentDoc.exists() && studentDoc.data().userId) {
+          await createNotification({
+            userId: studentDoc.data().userId,
+            type: "grade",
+            title: "Nouvelle note publiée",
+            body: `Votre note en ${subjectName(grade.subjectId)} (${grade.score}/${grade.maxScore}) est disponible.`,
+            module: "academics",
+            entityId: grade.id,
+            actionUrl: "/student/grades",
+          });
+        }
+      }
+
+      reloadGrades();
+    } catch (err) {
+      console.error("Erreur publication:", err);
+    }
   };
 
   const handleDelete = async (id) => {

@@ -16,6 +16,7 @@ export default function TeacherSidebar({ open, onClose }) {
 
   const links = [
     { href: "/teacher/dashboard", label: "Tableau de bord", icon: "🏠" },
+    { href: "/notifications", label: "Notifications", icon: "🔔" },
     { href: "/teacher/classes", label: "Mes classes", icon: "🏫" },
     { href: "/teacher/grades", label: "Notes", icon: "⭐" },
     { href: "/teacher/assignments", label: "Devoirs", icon: "📝" },

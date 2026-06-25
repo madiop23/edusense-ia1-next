@@ -7,7 +7,7 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { SCHOOL_ID } from "@/lib/school";
-
+import { createNotification } from "@/lib/notifications";
 export default function TeacherMessagesPage() {
   const [currentUid, setCurrentUid] = useState("");
   const [contacts, setContacts] = useState([]);
@@ -153,7 +153,7 @@ export default function TeacherMessagesPage() {
     }
   };
 
-  const sendMessage = async () => {
+ const sendMessage = async () => {
     const body = newMessage.trim();
     if (!body || !activeConv) return;
     setNewMessage("");
@@ -165,6 +165,23 @@ export default function TeacherMessagesPage() {
         createdAt: new Date(),
       });
       await updateDoc(doc(db, "conversations", activeConv.id), { lastMessageAt: new Date() });
+
+      // Notifier l'autre participant (conversation directe)
+      if (activeConv.type === "direct") {
+        const recipientId = activeConv.participantIds.find((id) => id !== currentUid);
+        if (recipientId) {
+          await createNotification({
+            userId: recipientId,
+            type: "message",
+            title: "Nouveau message",
+            body: `Vous avez reçu un message : "${body.length > 50 ? body.substring(0, 50) + "..." : body}"`,
+            module: "messaging",
+            entityId: activeConv.id,
+            actionUrl: "",
+          });
+        }
+      }
+
       openConversation(activeConv);
     } catch (err) {
       console.error("Erreur envoi:", err);

@@ -16,6 +16,7 @@ export default function RepresentativeSidebar({ open, onClose }) {
 
   const links = [
     { href: "/representative/dashboard", label: "Tableau de bord", icon: "🏠" },
+    { href: "/notifications", label: "Notifications", icon: "🔔" },
     { href: "/representative/classes", label: "Classes suivies", icon: "🏫" },
   ];
 

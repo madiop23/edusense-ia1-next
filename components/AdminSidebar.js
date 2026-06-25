@@ -16,6 +16,7 @@ export default function AdminSidebar({ open, onClose }) {
 
   const links = [
     { href: "/admin/dashboard", label: "Tableau de bord", icon: "🏠" },
+    { href: "/notifications", label: "Notifications", icon: "🔔" },
     { href: "/admin/classes", label: "Classes", icon: "🏫" },
     { href: "/admin/subjects", label: "Matières", icon: "📚" },
     { href: "/admin/terms", label: "Années & Trimestres", icon: "📆" },
