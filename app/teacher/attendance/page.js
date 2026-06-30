@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { SCHOOL_ID } from "@/lib/school";
+import { createNotification } from "@/lib/notifications";
 
 export default function TeacherAttendancePage() {
   const [classes, setClasses] = useState([]);
@@ -77,6 +78,33 @@ export default function TeacherAttendancePage() {
         records: records,
         createdAt: new Date(),
       });
+
+      // Notifier les parents des élèves absents ou en retard
+      for (const rec of records) {
+        if (rec.status === "absent" || rec.status === "late") {
+          const student = classStudents.find((s) => s.id === rec.studentId);
+          const studentFullName = student ? `${student.firstName} ${student.lastName}` : "Votre enfant";
+          const statutTexte = rec.status === "absent" ? "absent(e)" : "en retard";
+
+          // Chercher les parents rattachés à cet élève
+          const linksSnap = await getDocs(
+            query(collection(db, "parentLinks"), where("studentId", "==", rec.studentId))
+          );
+          for (const linkDoc of linksSnap.docs) {
+            const parentId = linkDoc.data().parentId;
+            await createNotification({
+              userId: parentId,
+              type: "attendance",
+              title: rec.status === "absent" ? "Absence signalée" : "Retard signalé",
+              body: `${studentFullName} a été marqué(e) ${statutTexte} le ${date}.`,
+              module: "attendance",
+              entityId: rec.studentId,
+              actionUrl: "",
+            });
+          }
+        }
+      }
+
       setMessage("✅ Appel enregistré avec succès !");
       setStatuses({});
     } catch (err) {
