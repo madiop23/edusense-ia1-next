@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, getDoc, deleteDoc, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc, getDocs, getDoc, deleteDoc, updateDoc, doc, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { SCHOOL_ID } from "@/lib/school";
@@ -108,19 +108,45 @@ export default function TeacherGradesPage() {
     try {
       await updateDoc(doc(db, "schools", SCHOOL_ID, "grades", id), { published: true });
 
-      // Retrouver la note pour notifier l'élève
+      // Retrouver la note
       const grade = grades.find((g) => g.id === id);
       if (grade) {
+        const matiere = subjectName(grade.subjectId);
+
+        // Lire le profil de l'élève (pour son userId et son nom)
         const studentDoc = await getDoc(doc(db, "schools", SCHOOL_ID, "students", grade.studentId));
+
+        // 1. Notifier l'ÉLÈVE
         if (studentDoc.exists() && studentDoc.data().userId) {
           await createNotification({
             userId: studentDoc.data().userId,
             type: "grade",
             title: "Nouvelle note publiée",
-            body: `Votre note en ${subjectName(grade.subjectId)} (${grade.score}/${grade.maxScore}) est disponible.`,
+            body: `Votre note en ${matiere} (${grade.score}/${grade.maxScore}) est disponible.`,
             module: "academics",
             entityId: grade.id,
             actionUrl: "/student/grades",
+          });
+        }
+
+        // 2. Notifier le(s) PARENT(S) rattaché(s) à cet élève (sans redirection)
+        const studentFullName = studentDoc.exists()
+          ? `${studentDoc.data().firstName} ${studentDoc.data().lastName}`
+          : "votre enfant";
+
+        const linksSnap = await getDocs(
+          query(collection(db, "parentLinks"), where("studentId", "==", grade.studentId))
+        );
+        for (const linkDoc of linksSnap.docs) {
+          const parentId = linkDoc.data().parentId;
+          await createNotification({
+            userId: parentId,
+            type: "grade",
+            title: "Nouvelle note de votre enfant",
+            body: `${studentFullName} a reçu une note en ${matiere} (${grade.score}/${grade.maxScore}).`,
+            module: "academics",
+            entityId: grade.id,
+            actionUrl: "",
           });
         }
       }
