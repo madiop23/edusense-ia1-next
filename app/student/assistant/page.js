@@ -80,6 +80,7 @@ export default function StudentAssistantPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, history, language }),
       });
+      
       const data = await response.json();
 
       if (data.text) {

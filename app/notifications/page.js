@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { collection, getDocs, doc, updateDoc, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
 
 export default function NotificationsPage() {
+  const router = useRouter();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUid, setCurrentUid] = useState("");
@@ -39,28 +41,36 @@ export default function NotificationsPage() {
   }, []);
 
   const markAsRead = async (notif) => {
-    if (notif.read) return;
-    try {
-      await updateDoc(doc(db, "notifications", notif.id), { read: true });
-      setNotifications((prev) => prev.map((n) => n.id === notif.id ? { ...n, read: true } : n));
-    } catch (err) {
-      console.error("Erreur:", err);
-    }
-  };
+      // Marquer comme lu (si pas déjà lu)
+      if (!notif.read) {
+        try {
+          await updateDoc(doc(db, "notifications", notif.id), { read: true });
+          setNotifications((prev) => prev.map((n) => n.id === notif.id ? { ...n, read: true } : n));
+        } catch (err) {
+          console.error("Erreur:", err);
+        }
+      }
 
-  const markAllAsRead = async () => {
-    const unread = notifications.filter((n) => !n.read);
-    for (const n of unread) {
-      await updateDoc(doc(db, "notifications", n.id), { read: true });
-    }
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
+      // Rediriger vers le contenu concerné (si une URL est définie)
+      const url = notif.data?.actionUrl;
+      if (url) {
+        router.push(url);
+      }
+    };
 
-  const formatDate = (ts) => {
-    if (!ts) return "";
-    const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleDateString("fr-FR") + " à " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  };
+    const markAllAsRead = async () => {
+      const unread = notifications.filter((n) => !n.read);
+      for (const n of unread) {
+        await updateDoc(doc(db, "notifications", n.id), { read: true });
+      }
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    };
+
+    const formatDate = (ts) => {
+      if (!ts) return "";
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString("fr-FR") + " à " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    };
 
   const typeIcon = (type) => {
     const map = {
