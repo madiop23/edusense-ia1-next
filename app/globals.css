@@ -17,3 +17,32 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Styles pour la page d'accueil EDU-SENSE IA */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes pulse2 {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; }
+}
+.float { animation: floatY 4s ease-in-out infinite; }
+.hero-gradient {
+  background: linear-gradient(120deg, #022b63, #054a8f, #0aaaff, #022b63);
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+}
+.card-hover { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px -12px rgba(10, 170, 255, 0.25);
+}
+::-webkit-scrollbar { width: 9px; }
+::-webkit-scrollbar-track { background: #eef6ff; }
+::-webkit-scrollbar-thumb { background: #0aaaff; border-radius: 5px; }
