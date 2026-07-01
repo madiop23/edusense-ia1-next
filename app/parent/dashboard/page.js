@@ -61,7 +61,7 @@ export default function ParentDashboard() {
     { label: "Notifications", icon: "🔔", href: "/notifications" },
   ];
 
-  const bannerStyle = { background: "linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%)" };
+  const bannerStyle = { background: "linear-gradient(120deg, #022B63 0%, #054a8f 55%, #0AAAFF 100%)" };
 
   const avatarClass =
     "w-14 h-14 rounded-full flex items-center justify-center " +
@@ -75,8 +75,8 @@ export default function ParentDashboard() {
 
   const shortcutClass =
     "group flex items-center gap-3 p-4 rounded-xl bg-gray-50 " +
-    "hover:bg-green-50 border border-transparent hover:border-green-200 " +
-    "transition-all duration-200 text-sm font-medium text-gray-700 hover:text-green-800";
+    "hover:bg-[#E6F1FB] border border-transparent hover:border-[#0AAAFF]/30 " +
+    "transition-all duration-200 text-sm font-medium text-gray-700 hover:text-[#022B63]";
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-[fadeIn_0.5s_ease]">
@@ -85,15 +85,15 @@ export default function ParentDashboard() {
         <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10"></div>
         <div className="absolute -bottom-10 right-16 w-28 h-28 rounded-full bg-white/5"></div>
         <div className="relative">
-          <p className="text-green-100 text-sm mb-1">Espace parent</p>
+          <p className="text-white/70 text-sm mb-1">Espace parent</p>
           <h1 className="text-2xl md:text-3xl font-bold mb-1">Bonjour, {name} 👋</h1>
-          <p className="text-green-100 text-sm">Suivez la scolarité de vos enfants.</p>
+          <p className="text-white/70 text-sm">Suivez la scolarité de vos enfants.</p>
         </div>
       </div>
 
       <div>
         <h2 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-          <span className="w-1.5 h-5 rounded-full bg-green-500"></span>
+          <span className="w-1.5 h-5 rounded-full bg-[#5FBF56]"></span>
           Mes enfants
         </h2>
 
@@ -115,14 +115,14 @@ export default function ParentDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {children.map((child, i) => (
               <Link key={child.id} href="/parent/follow-up" style={{ animationDelay: `${i * 80}ms` }} className={cardClass}>
-                <div className={avatarClass} style={{ background: "linear-gradient(135deg, #4ade80, #16a34a)" }}>
+                <div className={avatarClass} style={{ background: "linear-gradient(135deg, #0AAAFF, #5FBF56)" }}>
                   {child.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-gray-800">{child.name}</p>
                   <p className="text-sm text-gray-500">Classe {child.className}</p>
                 </div>
-                <span className="text-green-500 opacity-0 group-hover:opacity-100 transition-all duration-200">→</span>
+                <span className="text-[#0AAAFF] opacity-0 group-hover:opacity-100 transition-all duration-200">→</span>
               </Link>
             ))}
           </div>
@@ -131,7 +131,7 @@ export default function ParentDashboard() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-          <span className="w-1.5 h-5 rounded-full bg-green-500"></span>
+          <span className="w-1.5 h-5 rounded-full bg-[#5FBF56]"></span>
           Accès rapide
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

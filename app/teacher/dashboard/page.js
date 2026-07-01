@@ -16,13 +16,11 @@ export default function TeacherDashboard() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
       try {
-        // Nom de l'enseignant
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           setName(userDoc.data().displayName || "Enseignant");
         }
 
-        // Mes classes (via affectations)
         const classesSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "classes"));
         const myClassIds = new Set();
         for (const c of classesSnap.docs) {
@@ -34,11 +32,9 @@ export default function TeacherDashboard() {
           });
         }
 
-        // Notes saisies par moi
         const gradesSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "grades"));
         const myGrades = gradesSnap.docs.filter((d) => d.data().recordedBy === user.uid);
 
-        // Devoirs créés par moi
         const assignmentsSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "assignments"));
         const myAssignments = assignmentsSnap.docs.filter((d) => d.data().teacherId === user.uid);
 
@@ -57,9 +53,9 @@ export default function TeacherDashboard() {
   }, []);
 
   const cards = [
-    { label: "Mes classes", value: stats.classes, icon: "🏫", ring: "bg-green-50 text-green-600" },
-    { label: "Notes saisies", value: stats.grades, icon: "📝", ring: "bg-emerald-50 text-emerald-600" },
-    { label: "Devoirs créés", value: stats.assignments, icon: "📚", ring: "bg-teal-50 text-teal-600" },
+    { label: "Mes classes", value: stats.classes, icon: "🏫", ring: "bg-[#E6F1FB] text-[#0C447C]" },
+    { label: "Notes saisies", value: stats.grades, icon: "📝", ring: "bg-[#EAF3DE] text-[#27500A]" },
+    { label: "Devoirs créés", value: stats.assignments, icon: "📚", ring: "bg-[#E6F1FB] text-[#022B63]" },
   ];
 
   const shortcuts = [
@@ -74,19 +70,17 @@ export default function TeacherDashboard() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-[fadeIn_0.5s_ease]">
 
-      {/* Bannière */}
       <div className="relative overflow-hidden rounded-3xl p-7 text-white shadow-lg"
-           style={{ background: "linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%)" }}>
+           style={{ background: "linear-gradient(120deg, #022B63 0%, #054a8f 55%, #0AAAFF 100%)" }}>
         <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10"></div>
         <div className="absolute -bottom-10 right-16 w-28 h-28 rounded-full bg-white/5"></div>
         <div className="relative">
-          <p className="text-green-100 text-sm mb-1">Espace enseignant</p>
+          <p className="text-white/70 text-sm mb-1">Espace enseignant</p>
           <h1 className="text-2xl md:text-3xl font-bold mb-1">Bonjour, {name} 👋</h1>
-          <p className="text-green-100 text-sm">Bienvenue dans votre espace de travail.</p>
+          <p className="text-white/70 text-sm">Bienvenue dans votre espace de travail.</p>
         </div>
       </div>
 
-      {/* Cartes de stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {cards.map((c, i) => (
           <div key={i}
@@ -103,19 +97,18 @@ export default function TeacherDashboard() {
         ))}
       </div>
 
-      {/* Raccourcis */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-          <span className="w-1.5 h-5 rounded-full bg-green-500"></span>
+          <span className="w-1.5 h-5 rounded-full bg-[#5FBF56]"></span>
           Accès rapide
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {shortcuts.map((s, i) => (
             <Link key={i} href={s.href}
-                  className="group flex items-center gap-3 p-4 rounded-xl bg-gray-50 hover:bg-green-50 border border-transparent hover:border-green-200 transition-all duration-200 text-sm font-medium text-gray-700 hover:text-green-800">
+                  className="group flex items-center gap-3 p-4 rounded-xl bg-gray-50 hover:bg-[#E6F1FB] border border-transparent hover:border-[#0AAAFF]/30 transition-all duration-200 text-sm font-medium text-gray-700 hover:text-[#022B63]">
               <span className="text-xl group-hover:scale-110 transition-transform duration-200">{s.icon}</span>
               {s.label}
-              <span className="ml-auto opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-200 text-green-500">→</span>
+              <span className="ml-auto opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1 transition-all duration-200 text-[#0AAAFF]">→</span>
             </Link>
           ))}
         </div>

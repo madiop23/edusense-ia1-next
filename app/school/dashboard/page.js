@@ -42,10 +42,10 @@ export default function SchoolDashboard() {
   }, []);
 
   const cards = [
-    { label: "Classes", value: stats.classes, icon: "🏫", ring: "bg-green-50 text-green-600" },
-    { label: "Élèves", value: stats.students, icon: "🎓", ring: "bg-emerald-50 text-emerald-600" },
-    { label: "Enseignants", value: stats.teachers, icon: "👨‍🏫", ring: "bg-teal-50 text-teal-600" },
-    { label: "Matières", value: stats.subjects, icon: "📚", ring: "bg-lime-50 text-lime-600" },
+    { label: "Classes", value: stats.classes, icon: "🏫", ring: "bg-[#E6F1FB] text-[#0C447C]" },
+    { label: "Élèves", value: stats.students, icon: "🎓", ring: "bg-[#EAF3DE] text-[#27500A]" },
+    { label: "Enseignants", value: stats.teachers, icon: "👨‍🏫", ring: "bg-[#E6F1FB] text-[#022B63]" },
+    { label: "Matières", value: stats.subjects, icon: "📚", ring: "bg-[#EAF3DE] text-[#3B6D11]" },
   ];
 
   const shortcuts = [
@@ -55,7 +55,7 @@ export default function SchoolDashboard() {
     { label: "Notifications", icon: "🔔", href: "/notifications" },
   ];
 
-  const bannerStyle = { background: "linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%)" };
+  const bannerStyle = { background: "linear-gradient(120deg, #022B63 0%, #054a8f 55%, #0AAAFF 100%)" };
 
   const cardClass =
     "group bg-white rounded-2xl border border-gray-100 p-5 shadow-sm " +
@@ -68,8 +68,8 @@ export default function SchoolDashboard() {
 
   const shortcutClass =
     "group flex items-center gap-3 p-4 rounded-xl bg-gray-50 " +
-    "hover:bg-green-50 border border-transparent hover:border-green-200 " +
-    "transition-all duration-200 text-sm font-medium text-gray-700 hover:text-green-800";
+    "hover:bg-[#E6F1FB] border border-transparent hover:border-[#0AAAFF]/30 " +
+    "transition-all duration-200 text-sm font-medium text-gray-700 hover:text-[#022B63]";
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-[fadeIn_0.5s_ease]">
@@ -78,9 +78,9 @@ export default function SchoolDashboard() {
         <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10"></div>
         <div className="absolute -bottom-10 right-16 w-28 h-28 rounded-full bg-white/5"></div>
         <div className="relative">
-          <p className="text-green-100 text-sm mb-1">Direction</p>
+          <p className="text-white/70 text-sm mb-1">Direction</p>
           <h1 className="text-2xl md:text-3xl font-bold mb-1">Bonjour, {name} 👋</h1>
-          <p className="text-green-100 text-sm">Pilotez votre établissement.</p>
+          <p className="text-white/70 text-sm">Pilotez votre établissement.</p>
         </div>
       </div>
 
@@ -102,7 +102,7 @@ export default function SchoolDashboard() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-          <span className="w-1.5 h-5 rounded-full bg-green-500"></span>
+          <span className="w-1.5 h-5 rounded-full bg-[#5FBF56]"></span>
           Accès rapide
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

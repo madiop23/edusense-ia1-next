@@ -16,7 +16,6 @@ export default function StudentDashboard() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
       try {
-        // Profil élève
         const userDoc = await getDoc(doc(db, "users", user.uid));
         const studentId = userDoc.exists() ? userDoc.data().studentId : null;
         if (userDoc.exists()) {
@@ -24,24 +23,20 @@ export default function StudentDashboard() {
         }
 
         if (studentId) {
-          // Récupérer la classe de l'élève
           const sDoc = await getDoc(doc(db, "schools", SCHOOL_ID, "students", studentId));
           const classId = sDoc.exists() ? sDoc.data().classId : null;
 
-          // Notes publiées de l'élève
           const gradesSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "grades"));
           const myGrades = gradesSnap.docs
             .map((d) => d.data())
             .filter((g) => g.studentId === studentId && g.published);
 
-          // Calcul de la moyenne
           let moyenne = "—";
           if (myGrades.length > 0) {
             const total = myGrades.reduce((sum, g) => sum + (g.score / g.maxScore) * 20, 0);
             moyenne = (total / myGrades.length).toFixed(1);
           }
 
-          // Devoirs publiés de sa classe
           let devoirsCount = 0;
           if (classId) {
             const assignSnap = await getDocs(collection(db, "schools", SCHOOL_ID, "assignments"));
@@ -62,9 +57,9 @@ export default function StudentDashboard() {
   }, []);
 
   const cards = [
-    { label: "Moyenne générale", value: stats.moyenne, icon: "📊", ring: "bg-green-50 text-green-600", suffix: "/20" },
-    { label: "Notes reçues", value: stats.notes, icon: "📝", ring: "bg-emerald-50 text-emerald-600", suffix: "" },
-    { label: "Devoirs", value: stats.devoirs, icon: "📚", ring: "bg-teal-50 text-teal-600", suffix: "" },
+    { label: "Moyenne générale", value: stats.moyenne, icon: "📊", ring: "bg-[#E6F1FB] text-[#0C447C]", suffix: "/20" },
+    { label: "Notes reçues", value: stats.notes, icon: "📝", ring: "bg-[#EAF3DE] text-[#27500A]", suffix: "" },
+    { label: "Devoirs", value: stats.devoirs, icon: "📚", ring: "bg-[#E6F1FB] text-[#022B63]", suffix: "" },
   ];
 
   const shortcuts = [
@@ -76,7 +71,7 @@ export default function StudentDashboard() {
     { label: "Messages", icon: "✉️", href: "/student/messages" },
   ];
 
-  const bannerStyle = { background: "linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%)" };
+  const bannerStyle = { background: "linear-gradient(120deg, #022B63 0%, #054a8f 55%, #0AAAFF 100%)" };
 
   const cardClass =
     "group bg-white rounded-2xl border border-gray-100 p-5 shadow-sm " +
@@ -89,8 +84,8 @@ export default function StudentDashboard() {
 
   const shortcutClass =
     "group flex items-center gap-3 p-4 rounded-xl bg-gray-50 " +
-    "hover:bg-green-50 border border-transparent hover:border-green-200 " +
-    "transition-all duration-200 text-sm font-medium text-gray-700 hover:text-green-800";
+    "hover:bg-[#E6F1FB] border border-transparent hover:border-[#0AAAFF]/30 " +
+    "transition-all duration-200 text-sm font-medium text-gray-700 hover:text-[#022B63]";
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-[fadeIn_0.5s_ease]">
@@ -99,9 +94,9 @@ export default function StudentDashboard() {
         <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10"></div>
         <div className="absolute -bottom-10 right-16 w-28 h-28 rounded-full bg-white/5"></div>
         <div className="relative">
-          <p className="text-green-100 text-sm mb-1">Espace élève</p>
+          <p className="text-white/70 text-sm mb-1">Espace élève</p>
           <h1 className="text-2xl md:text-3xl font-bold mb-1">Bonjour, {name} 👋</h1>
-          <p className="text-green-100 text-sm">Voici un aperçu de ta scolarité.</p>
+          <p className="text-white/70 text-sm">Voici un aperçu de ta scolarité.</p>
         </div>
       </div>
 
@@ -123,7 +118,7 @@ export default function StudentDashboard() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-          <span className="w-1.5 h-5 rounded-full bg-green-500"></span>
+          <span className="w-1.5 h-5 rounded-full bg-[#5FBF56]"></span>
           Accès rapide
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
